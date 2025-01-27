@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Add favicon links -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./favicons/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./favicons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./favicons/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./favicons/site.webmanifest" />
+
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <title>Matīss prec Agnesi</title>
+    <style>
+      @keyframes gradient {
+        0% {
+          background-position: 0% 50%;
+          background-size: 200% 200%;
+        }
+        25% {
+          background-position: 100% 50%;
+          background-size: 150% 150%;
+        }
+        50% {
+          background-position: 100% 100%;
+          background-size: 200% 200%;
+        }
+        75% {
+          background-position: 0% 100%;
+          background-size: 150% 150%;
+        }
+        100% {
+          background-position: 0% 50%;
+          background-size: 200% 200%;
+        }
+      }
+
+      .terminal {
+        background: #000;
+        border-radius: 8px;
+        padding: 0.5rem;
+        width: 100%;
+        font-family: "Courier New", monospace;
+        color: #00ff00;
+        text-shadow: 0 0 8px #00ff00;
+        border: 1px solid #00ff00;
+        box-shadow: 0 0 16px rgba(0, 255, 0, 0.2);
+      }
+
+      .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+      }
+
+      .emoji {
+        position: absolute;
+        font-size: 24px;
+        user-select: none;
+      }
+
+      @keyframes fall {
+        to {
+          transform: translateY(100vh) rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="confetti" class="confetti-container"></div>
+    <div class="container mx-auto px-2 py-8">
+      <h1 class="uppercase text-5xl font-extrabold text-center py-8">
+        <span
+          class="leading-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 animate-[gradient_3s_ease-in-out_infinite] bg-size-200"
+        >
+          Agnesei būs kāzas!!!1!
+        </span>
+        <span>😎</span>
+      </h1>
+
+      <p class="text-right text-gray-500 text-sm">
+        (Matīss arī gan jau piedalīsies)
+      </p>
+
+      <div class="mt-12">
+        <div class="terminal text-3xl">
+          <div class="text-center">
+            <div id="countdown-1" class="text-3xl sm:text-5xl"></div>
+            <div id="countdown-2" class="text-6xl sm:text-8xl"></div>
+          </div>
+        </div>
+        <div
+          id="fridays"
+          class="mt-4 text-xl sm:text-2xl text-gray-500 text-center"
+        ></div>
+      </div>
+
+      <script>
+        const weddingDate = new Date("2025-07-19T10:00:00+03:00");
+
+        const zeroPad = (num) => (num < 10 ? `0${num}` : num);
+
+        function updateCountdown() {
+          const now = new Date();
+          const diff = weddingDate - now;
+
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor(
+            (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+          document.getElementById("countdown-1").innerText = `${days} dienas, `;
+          document.getElementById("countdown-2").innerText = `${zeroPad(
+            hours
+          )}:${zeroPad(minutes)}:${zeroPad(seconds)}`;
+        }
+
+        function countFridays() {
+          const now = new Date();
+
+          // Get days between dates
+          const totalDays = Math.floor(
+            (weddingDate - now) / (1000 * 60 * 60 * 24)
+          );
+
+          // Get current day (0 = Sunday, 5 = Friday)
+          const startDay = now.getDay();
+          const endDay = weddingDate.getDay();
+
+          // Calculate complete weeks
+          let fridayCount = Math.floor(totalDays / 7);
+
+          // Adjust for partial week at start
+          if (startDay <= 5) {
+            fridayCount += 1;
+          }
+
+          // Adjust for partial week at end if wedding is before Friday
+          if (endDay < 5) {
+            fridayCount -= 1;
+          }
+
+          document.getElementById(
+            "fridays"
+          ).innerHTML = `Līdz kāzām palikušas tikai <strong>${fridayCount}</strong> piektdienas!`;
+        }
+
+        updateCountdown();
+        countFridays();
+        setInterval(updateCountdown, 1000);
+
+        // Modified confetti animation
+        const emojis = ["🎉", "🎊", "✨", "💫", "💝", "💖", "💕", "🌟"];
+        const container = document.getElementById("confetti");
+        let timeElapsed = 0;
+
+        function createEmoji() {
+          const emoji = document.createElement("div");
+          emoji.className = "emoji";
+          emoji.style.left = Math.random() * 100 + "%";
+          emoji.style.transform = `rotate(${Math.random() * 360}deg)`;
+          emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+          const duration = 2 + Math.random() * 4; // Faster fall: 0.8-2s
+          emoji.style.animation = `fall ${duration}s linear forwards`;
+
+          container.appendChild(emoji);
+          setTimeout(() => emoji.remove(), duration * 1000);
+        }
+
+        // Bigger initial burst
+        for (let i = 0; i < 200; i++) {
+          setTimeout(() => createEmoji(), Math.random() * 2000);
+        }
+
+        // Random interval spawning
+        function spawnEmoji() {
+          if (timeElapsed < 3000) {
+            // Changed from 6000 to 3000
+            // First 3 seconds: gradually decrease from 8 to 1
+            const spawnCount = Math.max(
+              1,
+              Math.floor(8 * (1 - timeElapsed / 3000)) // Changed from 6000 to 3000
+            );
+            for (let i = 0; i < spawnCount; i++) createEmoji();
+            timeElapsed += 100;
+          } else {
+            // After 3 seconds: more frequent single emojis
+            const shouldSpawn = Math.random() < 0.7; // 70% chance to spawn (up from 30%)
+            if (shouldSpawn) {
+              createEmoji(); // Always spawn just one
+            }
+          }
+
+          // Random delay between 100-800ms for next spawn
+          setTimeout(spawnEmoji, 100 + Math.random() * 700);
+        }
+
+        spawnEmoji();
+      </script>
+    </div>
+  </body>
+</html>
